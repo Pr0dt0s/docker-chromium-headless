@@ -2,6 +2,9 @@
 
 CURRENT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
+echo:
+	sh -c "echo $(CURRENT_DIR)"
+
 get-version:
 	@docker pull ubuntu:bionic > /dev/null 2>&1
 	@docker run --rm \
@@ -16,14 +19,15 @@ test:
 	@timeout 20s sh -c "trap 'docker container rm --force chromium' 0; until curl http://localhost:9222/json/version; do sleep 1; done"
 
 tags:
-	@for i in 3 2 1 0 -1; do \
+	# @for i in 3 2 1 0 -1; do \
+	@for i in 3 -1; do \
 		if [ $$i -ge 0 ]; then \
 			tag=`echo $(version) | sed --regexp-extended "s/(\.[0-9]+){$$i}$$//"`; \
 		else \
 			tag=latest; \
 		fi; \
 		echo $$tag; \
-		docker tag chromium docker.pkg.github.com/nextools/images/chromium:$$tag; \
-		docker tag chromium nextools/chromium:$$tag; \
+		# docker tag chromium docker.pkg.github.com/nextools/images/chromium:$$tag; \
+		docker tag chromium pr0dt0s/chromium:$$tag; \
 		git tag --force chromium@$$tag; \
 	done
